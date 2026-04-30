@@ -19,8 +19,51 @@ int score = 0;
 void drawPlayer() {
     glPushMatrix();
     glTranslatef(playerX, playerY, 5.0f);
-    glColor3f(0, 0, 1);
-    glutSolidCube(2);
+
+    // ===== BADAN =====
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glPushMatrix();
+    glScalef(1.5f, 2.0f, 1.0f);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // ===== KEPALA =====
+    glColor3f(1.0f, 0.8f, 0.6f);
+    glPushMatrix();
+    glTranslatef(0, 1.8f, 0);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // ===== TANGAN KIRI =====
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glPushMatrix();
+    glTranslatef(-1.3f, 0.5f, 0);
+    glScalef(0.5f, 1.5f, 0.5f);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // ===== TANGAN KANAN =====
+    glPushMatrix();
+    glTranslatef(1.3f, 0.5f, 0);
+    glScalef(0.5f, 1.5f, 0.5f);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // ===== KAKI KIRI =====
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glPushMatrix();
+    glTranslatef(-0.5f, -1.5f, 0);
+    glScalef(0.6f, 1.5f, 0.6f);
+    glutSolidCube(1);
+    glPopMatrix();
+
+    // ===== KAKI KANAN =====
+    glPushMatrix();
+    glTranslatef(0.5f, -1.5f, 0);
+    glScalef(0.6f, 1.5f, 0.6f);
+    glutSolidCube(1);
+    glPopMatrix();
+
     glPopMatrix();
 }
 
