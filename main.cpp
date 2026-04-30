@@ -1,26 +1,21 @@
-#include <windows.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
-
-// ===== PLAYER =====
+#include <stdio.h> // <-- WAJIB buat printf
+// Posisi player
 float playerX = 0.0f;
 float playerY = 0.0f;
 float velocityY = 0.0f;
 bool isJumping = false;
 
-// animasi jalan
-float legAngle = 0.0f;
-
-// ===== OBSTACLE =====
+// Obstacle
 float obstacleZ = -50.0f;
 
-// ===== GAME =====
+// Game state
 bool gameOver = false;
 int score = 0;
 
-// ===== PLAYER =====
+// ===== DRAW OBJECT =====
 void drawPlayer() {
     glPushMatrix();
     glTranslatef(playerX, playerY, 5.0f);
@@ -43,11 +38,6 @@ void drawPlayer() {
     glColor3f(0.0f, 0.0f, 1.0f);
     glPushMatrix();
     glTranslatef(-1.3f, 0.5f, 0);
-
-    glTranslatef(0, 0.75f, 0);
-    glRotatef(-sin(legAngle * 0.1f) * 20, 1, 0, 0);
-    glTranslatef(0, -0.75f, 0);
-
     glScalef(0.5f, 1.5f, 0.5f);
     glutSolidCube(1);
     glPopMatrix();
@@ -55,11 +45,6 @@ void drawPlayer() {
     // ===== TANGAN KANAN =====
     glPushMatrix();
     glTranslatef(1.3f, 0.5f, 0);
-
-    glTranslatef(0, 0.75f, 0);
-    glRotatef(sin(legAngle * 0.1f) * 20, 1, 0, 0);
-    glTranslatef(0, -0.75f, 0);
-
     glScalef(0.5f, 1.5f, 0.5f);
     glutSolidCube(1);
     glPopMatrix();
@@ -67,24 +52,14 @@ void drawPlayer() {
     // ===== KAKI KIRI =====
     glColor3f(0.2f, 0.2f, 0.2f);
     glPushMatrix();
-    glTranslatef(-0.5f, -1.0f, 0);
-
-    glTranslatef(0, 0.75f, 0);
-    glRotatef(sin(legAngle * 0.1f) * 30, 1, 0, 0);
-    glTranslatef(0, -0.75f, 0);
-
+    glTranslatef(-0.5f, -1.5f, 0);
     glScalef(0.6f, 1.5f, 0.6f);
     glutSolidCube(1);
     glPopMatrix();
 
     // ===== KAKI KANAN =====
     glPushMatrix();
-    glTranslatef(0.5f, -1.0f, 0);
-
-    glTranslatef(0, 0.75f, 0);
-    glRotatef(-sin(legAngle * 0.1f) * 30, 1, 0, 0);
-    glTranslatef(0, -0.75f, 0);
-
+    glTranslatef(0.5f, -1.5f, 0);
     glScalef(0.6f, 1.5f, 0.6f);
     glutSolidCube(1);
     glPopMatrix();
@@ -92,7 +67,6 @@ void drawPlayer() {
     glPopMatrix();
 }
 
-// ===== OBSTACLE =====
 void drawObstacle() {
     glPushMatrix();
     glTranslatef(0, 0, obstacleZ);
@@ -101,20 +75,14 @@ void drawObstacle() {
     glPopMatrix();
 }
 
-// ===== GROUND =====
 void drawGround() {
     glColor3f(0.3, 0.3, 0.3);
-
-    for (int i = 0; i < 20; i++) {
-        float z = 10 - i * 10;
-
-        glBegin(GL_QUADS);
-        glVertex3f(-10, -2, z);
-        glVertex3f(10, -2, z);
-        glVertex3f(10, -2, z - 10);
-        glVertex3f(-10, -2, z - 10);
-        glEnd();
-    }
+    glBegin(GL_QUADS);
+    glVertex3f(-10, -2, 10);
+    glVertex3f(10, -2, 10);
+    glVertex3f(10, -2, -100);
+    glVertex3f(-10, -2, -100);
+    glEnd();
 }
 
 // ===== DISPLAY =====
@@ -122,6 +90,7 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    // Kamera third person
     gluLookAt(0, 5, 15, 0, 0, 0, 0, 1, 0);
 
     drawGround();
@@ -131,15 +100,10 @@ void display() {
     glutSwapBuffers();
 }
 
-// ===== UPDATE =====
+// ===== UPDATE GAME =====
 void update(int value) {
     if (!gameOver) {
-
-        // animasi jalan
-        legAngle += 5.0f;
-        if (legAngle > 360) legAngle -= 360;
-
-        // gravity
+        // Gravity
         if (isJumping) {
             playerY += velocityY;
             velocityY -= 0.01f;
@@ -150,18 +114,17 @@ void update(int value) {
             }
         }
 
-        // obstacle gerak
+        // Gerak obstacle
         obstacleZ += 0.5f;
 
+        // Reset obstacle
         if (obstacleZ > 10) {
             obstacleZ = -50;
             score++;
         }
 
-        // collision
-        if (fabs(playerX) < 1.5 &&
-            fabs(obstacleZ - 5) < 1.5 &&
-            playerY < 1) {
+        // Collision detection
+        if (fabs(playerX) < 1.5 && fabs(obstacleZ - 5) < 1.5 && playerY < 1) {
             gameOver = true;
             printf("Game Over! Score: %d\n", score);
         }
@@ -175,8 +138,12 @@ void update(int value) {
 void keyboard(int key, int x, int y) {
     if (gameOver) return;
 
-    if (key == GLUT_KEY_LEFT) playerX -= 2;
-    if (key == GLUT_KEY_RIGHT) playerX += 2;
+    if (key == GLUT_KEY_LEFT) {
+        playerX -= 2;
+    }
+    if (key == GLUT_KEY_RIGHT) {
+        playerX += 2;
+    }
 }
 
 void keyboardNormal(unsigned char key, int x, int y) {
@@ -191,7 +158,7 @@ void init() {
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
-    gluPerspective(60, 800.0 / 600.0, 1, 200);
+    gluPerspective(60, 1, 1, 200);
     glMatrixMode(GL_MODELVIEW);
 }
 
